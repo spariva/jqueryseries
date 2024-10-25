@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <script src="js/color-modes.js"></script>
+
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="">
+        <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
+        <meta name="generator" content="Hugo 0.122.0">
+        <title>Examen jquery</title>
+        <link href="./css/bootstrap.min.css" rel="stylesheet">
+        <link href="./css/sweetalert2.min.css" rel="stylesheet">
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Document</title>
+    </head>
+
+    <body>
+        <nav class="navbar navbar-expand-sm navbar-dark bg-primary" aria-label="Third navbar example">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="/">Series 🐲</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarsExample03" aria-controls="navbarsExample03" aria-expanded="false"
+                    aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarsExample03">
+                    <ul class="navbar-nav me-auto mb-2 mb-sm-0">
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="/jquery/Home.html">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="Create.html">Nuevo personaje</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/update">Modificar personaje</a>
+                        </li>
+
+                        <select id="listaSeries">
+
+                        </select>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <div class="container-fluid mt-3" id="listaPersonajes">
+
+        </div>
+
+        <script src="./js/bootstrap.bundle.min.js"></script>
+        <script src="./js/jquery-3.7.1.js"></script>
+        <script>
+            var url = "https://apiseriespersonajes2024.azurewebsites.net/";
+            $(document).ready(function () {
+                loadSeries();
+                loadPersonajes();
+
+                $("#listaSeries").change(function () {
+                    var selected = $(this).val();
+                    console.log(selected);
+                    var request = "api/series/" + parseInt(selected);
+
+                    $.getJSON(url + request, function (data) {
+                        var html = "";
+                        $("#serie").html("");
+                        console.log(data);
+
+                        $.each(data, function (index, serie) {
+                            $("#seriePersonajes").html("");
+                            $("#seriePersonajes").append(`
+                            <hr class='border border-primary opacity-100'>
+                            </hr>
+                            <div class='card'>
+                                <img class='card-img-top' src="${data.imagen}" />
+                                <div class='card-body'>
+                                    <h5 class='card-title'>${data.nombre}</h5>
+                                    <p class='card-text'>"IMBD": ${data.puntuacion}</p>
+                                    <a class='btn btn-primary w-100' href="Home.html?idSerie=${data.idSerie}">Personajes
+                                    </a>
+                                </div>
+                            </div>`);
+                        })
+                    });
+                });
+            })
+
+            function loadSeries() {
+                var request = "api/series";
+
+                $.getJSON(url + request, function (data) {
+                    var html = "";
+                    $("#listaSeries").html("");
+
+                    $.each(data, function (index, serie) {
+                        // console.log(serie.nombre);
+                        var serieOption = $("<option>", { "text": serie.nombre, "value": serie.idSerie });
+                        $("#listaSeries").append(serieOption);
+                    })
+                });
+            }
+
+            function loadPersonajes() {
+                var request = "api/personajes";
+                var params = new window.URLSearchParams(window.location.search);
+                var idSerie = params.get("idSerie");
+
+                $.getJSON(url + request, function (data) {
+                    var html = "";
+                    $("#listaPersonajes").html("");
+
+                    $.each(data, function (index, personaje) {
+                        if (personaje.idSerie == idSerie) {
+                            $("#listaPersonajes").append(`
+                                <div class="container-fluid mt-3">
+                                    <h1>Personajes de ${personaje.idSerie}</h1>
+                                    <hr class="border border-primary opacity-100"></hr>
+                                    <NavLink class="btn btn-danger w-100" href="Home.html?idSerie=${data.idSerie}">Volver a serie</NavLink>
+                                    <table class="table mt-3">
+                                        <thead class="border-primary">
+                                            <tr><th>Personaje</th><th>Imagen</th></tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>${personaje.nombre}</td>
+                                                <td><img class="img-fluid" alt="a" src=${personaje.imagen} style="height: '150px', widht:'150px'" /></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            `);
+                        }
+
+
+                    })
+                });
+            }
+
+        </script>
+    </body>
+
+</html>
